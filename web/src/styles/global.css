@@ -1,0 +1,627 @@
+/* ==================================================================
+   Steam 账号管理器 · 设计系统
+   参考 Apple HIG：毛玻璃层次、克制的留白、弹簧曲线动效
+   ================================================================== */
+
+:root {
+  --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+             "Segoe UI Variable Display", "Segoe UI", "PingFang SC",
+             "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "SF Mono", "Cascadia Code", "JetBrains Mono", ui-monospace,
+               Menlo, Consolas, "Courier New", monospace;
+
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* Apple 的弹簧曲线 */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --dur-fast: 160ms;
+  --dur: 280ms;
+  --dur-slow: 460ms;
+
+  --sidebar-w: 248px;
+  --topbar-h: 64px;
+}
+
+/* ---------------- 主题：深色（默认） ---------------- */
+
+html[data-theme='dark'], html:not([data-theme]) {
+  --bg: #07080c;
+  --bg-2: #0c0e14;
+  --surface: rgba(255, 255, 255, 0.055);
+  --surface-2: rgba(255, 255, 255, 0.085);
+  --surface-3: rgba(255, 255, 255, 0.12);
+  --card-bg: rgba(255, 255, 255, 0.07);
+  --surface-solid: #14161d;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-2: rgba(255, 255, 255, 0.16);
+  --hairline: rgba(255, 255, 255, 0.07);
+
+  --text: #f5f5f7;
+  --text-2: rgba(235, 235, 245, 0.62);
+  --text-3: rgba(235, 235, 245, 0.34);
+
+  --accent: #0a84ff;
+  --accent-hi: #409cff;
+  --accent-soft: rgba(10, 132, 255, 0.16);
+  --purple: #7d7aff;
+  --green: #32d74b;
+  --green-soft: rgba(50, 215, 75, 0.15);
+  --orange: #ff9f0a;
+  --orange-soft: rgba(255, 159, 10, 0.15);
+  --red: #ff453a;
+  --red-soft: rgba(255, 69, 58, 0.15);
+  --pink: #ff375f;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.75);
+  --shadow-lg: 0 32px 80px -24px rgba(0, 0, 0, 0.85);
+  --glow: 0 0 0 0.5px rgba(255, 255, 255, 0.06) inset;
+
+  --blur: 34px;
+  --blur-strong: 60px;
+  color-scheme: dark;
+}
+
+/* ---------------- 主题：浅色 ---------------- */
+
+html[data-theme='light'] {
+  --bg: #f2f2f6;
+  --bg-2: #fbfbfd;
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-2: rgba(255, 255, 255, 0.88);
+  --surface-3: rgba(255, 255, 255, 1);
+  --card-bg: rgba(255, 255, 255, 0.84);
+  --surface-solid: #ffffff;
+  --border: rgba(0, 0, 0, 0.07);
+  --border-2: rgba(0, 0, 0, 0.13);
+  --hairline: rgba(0, 0, 0, 0.06);
+
+  --text: #1d1d1f;
+  --text-2: rgba(60, 60, 67, 0.62);
+  --text-3: rgba(60, 60, 67, 0.34);
+
+  --accent: #0071e3;
+  --accent-hi: #0077ed;
+  --accent-soft: rgba(0, 113, 227, 0.1);
+  --purple: #5e5ce6;
+  --green: #28a745;
+  --green-soft: rgba(40, 167, 69, 0.12);
+  --orange: #f08c00;
+  --orange-soft: rgba(240, 140, 0, 0.12);
+  --red: #e0322a;
+  --red-soft: rgba(224, 50, 42, 0.1);
+  --pink: #e0325f;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.22);
+  --shadow-lg: 0 32px 80px -28px rgba(0, 0, 0, 0.3);
+  --glow: 0 0 0 0.5px rgba(255, 255, 255, 0.7) inset;
+
+  --blur: 30px;
+  --blur-strong: 50px;
+  color-scheme: light;
+}
+
+/* ================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #app { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+}
+
+h1, h2, h3, h4, p { margin: 0; }
+button { font-family: inherit; }
+
+::selection { background: var(--accent-soft); }
+
+/* 滚动条：细、克制、悬停才明显 */
+* { scrollbar-width: thin; scrollbar-color: var(--border-2) transparent; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: var(--r-pill);
+  border: 2.5px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--text-3); background-clip: content-box; }
+
+/* ==================================================================
+   极光背景
+   ================================================================== */
+
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% -10%, var(--bg-2), var(--bg) 62%);
+}
+
+.aurora__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.5;
+  will-change: transform;
+}
+
+html[data-theme='light'] .aurora__blob { opacity: 0.34; filter: blur(80px); }
+
+.aurora__blob--1 {
+  width: 52vw; height: 52vw; top: -18vw; left: -10vw;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 68%);
+  animation: drift1 34s var(--ease-in-out) infinite;
+}
+.aurora__blob--2 {
+  width: 46vw; height: 46vw; top: 8vw; right: -14vw;
+  background: radial-gradient(circle, var(--purple) 0%, transparent 68%);
+  animation: drift2 42s var(--ease-in-out) infinite;
+}
+.aurora__blob--3 {
+  width: 40vw; height: 40vw; bottom: -16vw; left: 28vw;
+  background: radial-gradient(circle, var(--pink) 0%, transparent 70%);
+  animation: drift3 50s var(--ease-in-out) infinite;
+}
+
+@keyframes drift1 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(8vw, 6vw, 0) scale(1.16); }
+  66% { transform: translate3d(-4vw, 10vw, 0) scale(0.94); }
+}
+@keyframes drift2 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  40% { transform: translate3d(-9vw, 8vw, 0) scale(1.2); }
+  70% { transform: translate3d(-3vw, -5vw, 0) scale(0.9); }
+}
+@keyframes drift3 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  45% { transform: translate3d(7vw, -8vw, 0) scale(1.24); }
+  75% { transform: translate3d(-6vw, -3vw, 0) scale(0.92); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora__blob { animation: none !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==================================================================
+   材质
+   ================================================================== */
+
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: var(--glow), var(--shadow-sm);
+}
+
+.glass-strong {
+  background: var(--surface-2);
+  backdrop-filter: blur(var(--blur-strong)) saturate(190%);
+  -webkit-backdrop-filter: blur(var(--blur-strong)) saturate(190%);
+  border: 1px solid var(--border-2);
+  box-shadow: var(--glow), var(--shadow-lg);
+}
+
+/* ==================================================================
+   按钮
+   ================================================================== */
+
+.btn {
+  --btn-bg: var(--surface-2);
+  --btn-fg: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 15px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: 13.5px;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: background var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-spring),
+              border-color var(--dur-fast) var(--ease-out),
+              opacity var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+}
+.btn:hover:not(:disabled) { background: var(--surface-3); border-color: var(--border-2); }
+.btn:active:not(:disabled) { transform: scale(0.965); }
+.btn:disabled { opacity: 0.42; cursor: not-allowed; }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.btn--primary {
+  --btn-bg: linear-gradient(180deg, var(--accent-hi), var(--accent));
+  --btn-fg: #fff;
+  border-color: transparent;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset, 0 6px 18px -6px var(--accent);
+}
+.btn--primary:hover:not(:disabled) {
+  --btn-bg: linear-gradient(180deg, var(--accent-hi), var(--accent-hi));
+  border-color: transparent;
+  filter: brightness(1.06);
+}
+
+.btn--danger { --btn-fg: var(--red); }
+.btn--danger:hover:not(:disabled) { background: var(--red-soft); border-color: transparent; }
+
+.btn--success { --btn-fg: var(--green); }
+.btn--success:hover:not(:disabled) { background: var(--green-soft); border-color: transparent; }
+
+.btn--ghost { --btn-bg: transparent; border-color: transparent; }
+.btn--ghost:hover:not(:disabled) { --btn-bg: var(--surface-2); border-color: transparent; }
+
+.btn--sm { height: 30px; padding: 0 11px; font-size: 12.5px; border-radius: var(--r-xs); }
+.btn--lg { height: 46px; padding: 0 22px; font-size: 15px; border-radius: var(--r-md); }
+.btn--block { width: 100%; }
+
+.btn--icon { width: 36px; padding: 0; }
+.btn--icon.btn--sm { width: 30px; }
+
+/* ==================================================================
+   输入
+   ================================================================== */
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+
+.field__label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+  padding-left: 2px;
+}
+
+.field__hint { font-size: 12px; color: var(--text-3); padding-left: 2px; line-height: 1.5; }
+
+.input, .textarea, .select {
+  width: 100%;
+  height: 40px;
+  padding: 0 13px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease-out),
+              background var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.input::placeholder, .textarea::placeholder { color: var(--text-3); }
+.input:hover, .textarea:hover, .select:hover { border-color: var(--border-2); }
+.input:focus, .textarea:focus, .select:focus {
+  border-color: var(--accent);
+  background: var(--surface-2);
+  box-shadow: 0 0 0 3.5px var(--accent-soft);
+}
+.textarea { height: auto; min-height: 92px; padding: 11px 13px; resize: vertical; line-height: 1.6; }
+.select {
+  cursor: pointer;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-2) 50%),
+                    linear-gradient(135deg, var(--text-2) 50%, transparent 50%);
+  background-position: calc(100% - 17px) 17px, calc(100% - 12px) 17px;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 32px;
+}
+html[data-theme='dark'] .select option { background: var(--surface-solid); color: var(--text); }
+
+.mono { font-family: var(--font-mono); font-variant-ligatures: none; }
+
+/* ==================================================================
+   卡片 / 徽标 / 标签
+   ================================================================== */
+
+.card {
+  border-radius: var(--r-lg);
+  /* 刻意不给卡片加 backdrop-filter：
+     一屏可能有几十张卡，而它们全都躺在滑动容器那个合成层里，
+     几十个模糊层叠加会让 Chromium 渲染不出来（要点一下才重绘）。
+     用不透明的半透明底色，观感几乎一致，但稳定且快得多。 */
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--glow), var(--shadow-sm);
+  transition: transform var(--dur) var(--ease-spring),
+              border-color var(--dur) var(--ease-out),
+              box-shadow var(--dur) var(--ease-out),
+              background var(--dur) var(--ease-out);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: var(--r-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.badge--green { background: var(--green-soft); color: var(--green); border-color: transparent; }
+.badge--orange { background: var(--orange-soft); color: var(--orange); border-color: transparent; }
+.badge--red { background: var(--red-soft); color: var(--red); border-color: transparent; }
+.badge--accent { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--text-3);
+  flex: none;
+}
+.dot--live {
+  background: var(--green);
+  box-shadow: 0 0 0 0 var(--green);
+  animation: pulseRing 2.1s var(--ease-out) infinite;
+}
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(50, 215, 75, 0.5); }
+  70% { box-shadow: 0 0 0 7px rgba(50, 215, 75, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(50, 215, 75, 0); }
+}
+
+.dot--warn {
+  background: var(--orange);
+  box-shadow: 0 0 0 0 rgba(255, 159, 10, 0.5);
+  animation: pulseRingWarn 2.1s var(--ease-out) infinite;
+}
+@keyframes pulseRingWarn {
+  0% { box-shadow: 0 0 0 0 rgba(255, 159, 10, 0.5); }
+  70% { box-shadow: 0 0 0 6px rgba(255, 159, 10, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 159, 10, 0); }
+}
+
+/* ==================================================================
+   动效工具
+
+   ★ 一律不使用 animation-fill-mode: both / backwards ★
+   with `both`，元素在动画延迟期间、或动画因任何原因（合成层被丢弃、
+   标签页不可见、浏览器节流）没有执行时，会一直停在 from 关键帧，
+   也就是 opacity: 0 —— 表现就是「数据在、DOM 在，但肉眼看不见，
+   点一下才出现」。不用填充模式，元素的静止状态就是可见的最终状态，
+   动画只是锦上添花，最坏情况也只是少一段动效。
+   ================================================================== */
+
+.fade-up { animation: fadeUp var(--dur-slow) var(--ease-spring); }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+
+.pop-in { animation: popIn var(--dur) var(--ease-spring); }
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.fade-in { animation: fadeIn var(--dur) var(--ease-out); }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* 列表入场：不加延迟（有延迟 + 无填充模式会闪烁；有填充模式又会隐身） */
+.stagger > * { animation: fadeUp 380ms var(--ease-spring); }
+
+/* ==================================================================
+   弹层
+   ================================================================== */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  animation: fadeIn var(--dur) var(--ease-out);
+}
+html[data-theme='light'] .overlay { background: rgba(0, 0, 0, 0.18); }
+
+.sheet {
+  width: 100%;
+  border-radius: var(--r-xl);
+  background: var(--surface-2);
+  backdrop-filter: blur(var(--blur-strong)) saturate(200%);
+  -webkit-backdrop-filter: blur(var(--blur-strong)) saturate(200%);
+  border: 1px solid var(--border-2);
+  box-shadow: var(--glow), var(--shadow-lg);
+  animation: sheetIn 420ms var(--ease-spring);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@keyframes sheetIn {
+  from { opacity: 0; transform: scale(0.93) translateY(20px); }
+  to { opacity: 1; transform: none; }
+}
+
+.sheet__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px 16px;
+  flex: none;
+}
+.sheet__title { font-size: 19px; font-weight: 680; letter-spacing: -0.025em; }
+.sheet__sub { font-size: 13px; color: var(--text-2); margin-top: 3px; }
+.sheet__body { padding: 0 24px; overflow-y: auto; flex: 1; }
+.sheet__foot {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 18px 24px 22px;
+  flex: none;
+}
+
+/* ==================================================================
+   布局骨架
+   ================================================================== */
+
+.app { position: relative; z-index: 1; height: 100%; display: flex; }
+
+.divider { height: 1px; background: var(--hairline); border: 0; margin: 0; }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 10px;
+  margin-bottom: 7px;
+}
+
+/* 面板小标题（列表区通用） */
+.panel__title {
+  font-size: 13.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 72px 24px;
+  text-align: center;
+  color: var(--text-2);
+}
+.empty__icon { font-size: 40px; opacity: 0.5; filter: grayscale(0.3); }
+.empty__title { font-size: 16px; font-weight: 620; color: var(--text); letter-spacing: -0.02em; }
+.empty__text { font-size: 13px; max-width: 380px; line-height: 1.65; }
+
+/* 细密进度条 */
+.meter {
+  position: relative;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.meter__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, var(--accent), var(--purple));
+  transition: width var(--dur-slow) var(--ease-out);
+}
+
+/* 键盘提示 */
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* ==================================================================
+   ★ 手机适配（≤ 620px）★
+
+   目标：手机上打开就能看账号情况 —— 空闲 / 使用中 / 待改密 + 今日次数。
+   桌面端的布局和功能一个都不动，这里全部只在窄屏生效。
+
+   实测踩过的问题（按手机尺寸截图看出来的）：
+     ① .sheet__foot 是 flex 且不换行 —— 「手动改密」弹窗底部三个按钮
+        （跳过改密，直接放回可用 / 取消 / 保存并回到可用）在 412px 上
+        **直接溢出弹窗，最后一个按钮被切掉**。这里改成竖排。
+     ② .overlay 上下留 24px、弹窗圆角四边都有 —— 手机上浪费竖向空间，
+        改成从底部升起（bottom sheet），更像原生 App。
+     ③ 手机上点击目标是手指不是鼠标，按钮高度统一提到 44px。
+   ================================================================== */
+@media (max-width: 620px) {
+  /* 弹窗：从底部升起，铺满宽度 */
+  .overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .sheet {
+    max-height: 92vh;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    border-bottom: 0;
+  }
+  .sheet__head { padding: 18px 16px 12px; }
+  .sheet__title { font-size: 17px; }
+  .sheet__sub { font-size: 12.5px; }
+  .sheet__body { padding: 0 16px; }
+
+  /* ★ 按钮竖排 —— 这就是那个"最后一个按钮被切掉"的修法 ★ */
+  .sheet__foot {
+    flex-direction: column-reverse;
+    padding: 14px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    gap: 8px;
+  }
+  .sheet__foot .btn {
+    width: 100%;
+    height: 44px;
+    justify-content: center;
+  }
+
+  /* 手指友好：输入框和按钮都加高 */
+  .input { height: 44px; font-size: 15px; }
+  .btn { height: 40px; }
+  .btn--sm { height: 36px; }
+  .btn--icon { width: 40px; }
+
+  /* 滚动更顺手 */
+  .sheet__body { -webkit-overflow-scrolling: touch; }
+}
+

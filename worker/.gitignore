@@ -1,0 +1,10 @@
+# 依赖
+node_modules/
+
+# 你的密钥 —— 绝对不要提交
+.env
+
+# 运行产物：截图、新密码恢复文件
+out/
+out-*/
+inspect-*.png

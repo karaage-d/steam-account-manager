@@ -1,0 +1,30 @@
+{
+  "name": "steam-account-manager-worker",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "改密 worker：轮询账号管理器的任务队列，用浏览器自动完成 Steam 改密",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "doctor": "node doctor.mjs",
+    "test": "node test-password.mjs && node test-detect.mjs && node test-code-exclude.mjs && node test-flow.mjs && node test-ui.mjs && node test-grouping.mjs && node test-dump.mjs && node test-api-panel.mjs && node test-xgj-sign.mjs && node test-xgj-flow.mjs && node test-xgj-panel.mjs",
+    "test:password": "node test-password.mjs",
+    "test:detect": "node test-detect.mjs",
+    "test:code": "node test-code-exclude.mjs",
+    "test:flow": "node test-flow.mjs",
+    "test:ui": "node test-ui.mjs",
+    "test:grouping": "node test-grouping.mjs",
+    "test:dump": "node test-dump.mjs",
+    "test:api": "node test-api-panel.mjs",
+    "test:xgj:sign": "node test-xgj-sign.mjs",
+    "test:xgj:flow": "node test-xgj-flow.mjs",
+    "test:xgj:panel": "node test-xgj-panel.mjs",
+    "start": "node index.mjs",
+    "once": "node index.mjs --once",
+    "dry": "node index.mjs --once --dry",
+    "inspect": "node inspect.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "^1.49.0"
+  }
+}

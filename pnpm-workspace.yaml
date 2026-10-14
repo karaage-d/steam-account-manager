@@ -1,0 +1,6 @@
+# pnpm 11 配置
+# 用扁平化的 node_modules 布局，避免 Windows 下 junction 解析导致的模块找不到
+nodeLinker: hoisted
+# esbuild 的 postinstall 只做二进制校验，跳过不影响构建
+allowBuilds:
+  esbuild: false

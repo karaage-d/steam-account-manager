@@ -1,0 +1,62 @@
+# ============================================================
+#  Steam 账号管理器 · 换行符规则
+#
+#  ★ 这个文件不是可选的 ★
+#
+#  仓库里有几个文件对换行符是「强制要求」，而且要求还相反：
+#
+#    · .bat 必须是 CRLF
+#        cmd.exe 按系统编码逐行读批处理文件。如果是 LF 结尾，
+#        它会把注释文字当命令执行 —— 表现为
+#        「'rem' 不是内部或外部命令」这类莫名其妙的报错。
+#        这个坑项目里真实踩过（见 启动闲管家隧道.bat 顶部注释）。
+#
+#    · .ps1 必须是 CRLF
+#        双击 .bat 时跑的是 Windows PowerShell 5.1，同理。
+#
+#    · .sh 必须是 LF
+#        Linux/Mac 上 CRLF 会让脚本报 "bad interpreter"。
+#
+#  没有这个文件时，换行符只取决于每个人本地的 git 配置，
+#  同一份仓库在不同机器上会长得不一样 —— 上面这些坑就会随机出现。
+# ============================================================
+
+# 默认：交给 git 自动处理，检出时用系统习惯的换行符
+* text=auto
+
+# ---------- ★ 必须是 CRLF ★ ----------
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+*.psm1  text eol=crlf
+
+# ---------- ★ 必须是 LF ★ ----------
+*.sh    text eol=lf
+
+# ---------- 纯文本：统一成 LF 入库 ----------
+*.md    text eol=lf
+*.mjs   text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.vue   text eol=lf
+*.css   text eol=lf
+*.html  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+.npmrc  text eol=lf
+
+# ---------- 二进制：绝对不要动它 ----------
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.db    binary
+*.woff  binary
+*.woff2 binary
+
+# 在 diff / 语言统计里把构建产物折叠掉，别干扰阅读
+web/dist/**  linguist-generated=true
+pnpm-lock.yaml  linguist-generated=true
+package-lock.json  linguist-generated=true

@@ -1,0 +1,30 @@
+{
+  "name": "steam-account-manager",
+  "private": true,
+  "version": "2.0.0",
+  "description": "本地运行的 Steam 多账号管理器：可用 / 使用中 / 待改密 三态流转，加密存储，超时自动派发 AI 改密",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node server/index.mjs",
+    "serve": "node server/index.mjs",
+    "launch": "node scripts/launch.mjs",
+    "build": "vite build",
+    "dev:web": "vite",
+    "selftest": "node scripts/selftest.mjs",
+    "test:mail": "node scripts/test-mail.mjs",
+    "test": "node scripts/selftest.mjs",
+    "go": "npm run build && npm run start"
+  },
+  "dependencies": {
+    "imapflow": "^2.2.11",
+    "mailparser": "^3.9.37",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.7"
+  }
+}
